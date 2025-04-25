@@ -5,6 +5,8 @@ const mysql = require('mysql2');
 const path = require('path');
 const app = express();
 const PORT = 5000;
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 // Middleware
 app.use(cors());
@@ -50,8 +52,44 @@ app.get('/documents', (req, res) => {
     });
 });
 
-app.get('/test', (req, res) => {
-    res.status(200).json({ message: 'Test API is working!' });
+
+// Fetch all or searched documents
+app.get('/documentsbySearch', (req, res) => {
+    const search = req.query.search;
+    let query = 'SELECT * FROM documents';
+    let params = [];
+
+    if (search) {
+        query += ' WHERE title LIKE ?';
+        params.push(`%${search}%`);
+    }
+
+    db.query(query, params, (err, rows) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).json({ error: "Internal Server Error" });
+        }
+        res.json(rows);
+    });
+});
+
+// Get a single document by ID
+app.get('/document/:id', (req, res) => {
+    const documentId = req.params.id;
+
+    const sql = 'SELECT * FROM documents WHERE id = ?';
+    db.query(sql, [documentId], (err, results) => {
+        if (err) {
+            console.error('Error fetching document:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Document not found' });
+        }
+
+        res.json(results[0]); // Return the single document
+    });
 });
 
 // Upload Route
@@ -79,6 +117,100 @@ app.post('/upload', upload.single('file'), (req, res) => {
     });
 });
 
+app.post('/increment-download', (req, res) => {
+    const { id } = req.body;
+
+    if (!id) {
+        console.log("Missing ID in request body");
+        return res.status(400).json({ message: 'Missing document ID' });
+    }
+
+    const sql = 'UPDATE documents SET download_count = download_count + 1 WHERE id = ?';
+
+    db.query(sql, [id], (err, result) => {
+        if (err) {
+            console.error('Database update error:', err);
+            return res.status(500).json({ message: 'Internal Server Error' });
+        }
+
+        // Optional: check if any row was updated
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Document not found' });
+        }
+
+        console.log(`Download count incremented for document ID: ${id}`);
+        res.status(200).json({ message: 'Download count incremented' });
+    });
+});  
+app.post('/register', async (req, res) => {
+    const { username, email, password } = req.body;
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+  
+    try {
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(password, 10);
+  
+      // Insert the new user into the database
+      const sql = 'INSERT INTO users (username, email, password) VALUES (?, ?, ?)';
+      const values = [username, email, hashedPassword];
+  
+      db.query(sql, values, (err, result) => {
+        if (err) {
+          console.error('Error registering user:', err);
+          return res.status(500).json({ message: 'Server error' });
+        }
+        res.status(201).json({ message: 'User registered successfully' });
+      });
+    } catch (error) {
+      console.error('Registration error:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+  
+  // Login Route
+  app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
+  
+    try {
+      // Find the user by email
+      const sql = 'SELECT * FROM users WHERE email = ?';
+      db.query(sql, [email], async (err, results) => {
+        if (err) {
+          console.error('Database error:', err);
+          return res.status(500).json({ message: 'Server error' });
+        }
+  
+        if (results.length === 0) {
+          return res.status(401).json({ message: 'Invalid credentials' });
+        }
+  
+        const user = results[0];
+  
+        // Compare password with the hashed password in DB
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) {
+          return res.status(401).json({ message: 'Invalid credentials' });
+        }
+  
+        // Generate a JWT token for the user
+        const token = jwt.sign({ id: user.id, username: user.username }, 'your_jwt_secret', {
+          expiresIn: '1h',
+        });
+  
+        res.status(200).json({ message: 'Login successful', token });
+      });
+    } catch (error) {
+      console.error('Login error:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+  
+  
 
 // Start server
 app.listen(PORT, () => {

@@ -1,42 +1,68 @@
+<!-- src/views/Search.vue -->
 <template>
-    <div class="container mx-auto">
-        <h1 class="text-3xl font-bold my-8">Search Documents</h1>
-        <input type="text" v-model="searchQuery" placeholder="Search by title..." class="p-2 border rounded w-full" />
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-            <DocumentCard v-for="doc in filteredDocuments" :key="doc.id" :document="doc" :image="doc.image" />
+    <div class="content-padding">
+      <header class=" text-white p-4">
+        <div class="container">
+          <form @submit.prevent="searchAgain" class="d-flex justify-content-center">
+            <input v-model="query" type="search" class="form-control me-1" placeholder="Search again..." />
+            <button class="btn btn-primary" type="submit">Search</button>
+          </form>
         </div>
+      </header>
+  
+      <div class="container py-5">
+        <div v-if="documents.length === 0" class="alert alert-info text-center">No documents found.</div>
+        <div class="row">
+          <div class="col-md-3" v-for="doc in documents" :key="doc.id">
+            <div class="card mb-4">
+              <img :src="require('@/assets/SMBC-Bank-logos.png')" class="card-img-top" />
+              <div class="card-body">
+                <h5 class="card-title">{{ doc.title }}</h5>
+                <a :href="`http://localhost:5000${doc.filepath}`" class="btn btn-primary" target="_blank">Download</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-</template>
-
-<script>
-import DocumentCard from "../components/DocumentCard.vue";
-
-export default {
-    // eslint-disable-next-line vue/multi-word-component-names
-    name: "Search",
-    components: {
-        DocumentCard,
-    },
+  </template>
+  
+  <script>
+  import axios from 'axios';
+  
+  export default {
+    name: 'SearchPage',
     data() {
-        return {
-            searchQuery: "",
-            documents: [
-                { id: 1, title: "Business Plan", description: "Sample document 1", image: "path/to/image1.jpg" },
-                { id: 2, title: "JavaScript Guide", description: "Sample document 2", image: "path/to/image2.jpg" },
-                // Add more documents
-            ],
-        };
+      return {
+        documents: [],
+        query: this.$route.query.q || '',
+      };
     },
-    computed: {
-        filteredDocuments() {
-            return this.documents.filter(doc =>
-                doc.title.toLowerCase().includes(this.searchQuery.toLowerCase())
-            );
-        },
+    mounted() {
+      this.fetchSearchResults();
     },
-};
-</script>
-
-<style scoped>
-/* You can add custom styling here */
-</style>
+    methods: {
+      async fetchSearchResults() {
+        if (!this.query) return;
+        try {
+          const res = await axios.get('http://localhost:5000/documentsbySearch', {
+            params: { search: this.query },
+          });
+          this.documents = res.data;
+        } catch (err) {
+          console.error('Error fetching search results:', err);
+          alert('Failed to fetch search results.');
+        }
+      },
+      searchAgain() {
+        this.$router.push({ path: '/search', query: { q: this.query } });
+        this.fetchSearchResults();
+      },
+    },
+  };
+  </script>
+  <style scoped>
+.container {
+  padding-top: 55px;
+}
+  </style>
