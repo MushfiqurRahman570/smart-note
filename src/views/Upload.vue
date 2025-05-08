@@ -53,6 +53,7 @@
 
 <script>
 import axios from 'axios';
+import { upload } from '@vercel/blob/client';
 
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
@@ -79,18 +80,24 @@ export default {
       const parsedUser = JSON.parse(storedUser);
       const uploaderName = parsedUser?.username || 'SmartNotes User';
 
-      const formData = new FormData();
-      formData.append('file', this.file);
-      formData.append('title', this.title);
-      formData.append('description', this.description);
-      formData.append('category', this.category);
-      formData.append('uploaderName', uploaderName);
-      formData.append('fileSize', this.file.size);
-
       try {
-        const response = await axios.post('http://localhost:5000/upload', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
+        // 1. Upload file to Vercel Blob
+        const { url: blobUrl } = await upload(this.file.name, this.file, {
+          access: 'public',
         });
+
+        // 2. Send metadata to your backend
+        const metadata = {
+          title: this.title,
+          description: this.description,
+          category: this.category,
+          uploaderName,
+          fileSize: this.file.size,
+          blobUrl: blobUrl,
+          fileName: this.file.name,
+        };
+
+        const response = await axios.post('http://localhost:5000/upload', metadata);
 
         if (response.status === 200) {
           alert('✅ Document uploaded successfully!');
@@ -101,6 +108,7 @@ export default {
         alert('❌ Upload failed. Please try again.');
       }
     },
+
     resetForm() {
       this.title = '';
       this.description = '';

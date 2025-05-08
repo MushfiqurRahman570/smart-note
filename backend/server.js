@@ -1,5 +1,5 @@
 const express = require('express');
-const multer = require('multer');
+// const multer = require('multer');
 const cors = require('cors');
 const mysql = require('mysql2');
 const path = require('path');
@@ -11,7 +11,7 @@ const jwt = require('jsonwebtoken');
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // MySQL Connection
 const db = mysql.createConnection({
@@ -30,15 +30,15 @@ db.connect((err) => {
 });
 
 // Multer config
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/');
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname);
-    }
-});
-const upload = multer({ storage });
+// const storage = multer.diskStorage({
+//     destination: function (req, file, cb) {
+//         cb(null, 'uploads/');
+//     },
+//     filename: function (req, file, cb) {
+//         cb(null, Date.now() + '-' + file.originalname);
+//     }
+// });
+// const upload = multer({ storage });
 
 // Fetch all documents from the database
 app.get('/documents', (req, res) => {
