@@ -6,6 +6,9 @@ import Content from '../views/Content.vue';
 import DocumentView from '../views/DocumentView.vue';
 import Register from '../views/RegisterPage.vue';
 import Login from '../views/LoginPage.vue';
+import Profile from '../views/Profile.vue';
+import About from '../views/about.vue';
+
 
 const routes = [
     { path: '/', component: Home },
@@ -14,6 +17,8 @@ const routes = [
     { path: '/content', component: Content },
     { path: '/register', component: Register },
     { path: '/login', component: Login },
+    { path: '/profile', component: Profile },
+    { path: '/about', component: About },
     { path: '/document/:id', name: 'DocumentView', component: DocumentView, props: true },
 ];
 

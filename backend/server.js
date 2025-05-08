@@ -94,19 +94,20 @@ app.get('/document/:id', (req, res) => {
 
 // Upload Route
 app.post('/upload', upload.single('file'), (req, res) => {
-    const { title, description } = req.body;
-    const file = req.file;
+  const { title, category, description, uploaderName} = req.body;
+  const fileSize = parseInt(req.body.fileSize, 10);
+  const file = req.file;
 
-    if (!file || !title || !description) {
-        return res.status(400).json({ message: 'All fields required' });
-    }
+  if (!file || !title || !description || !uploaderName || !category) {
+      return res.status(400).json({ message: 'All fields including uploader name are required' });
+  }
 
     // Construct the file path for the database
     const filePath = `/uploads/${file.filename}`; // The file path accessible through the server
 
     // Insert the document into the database
-    const sql = "INSERT INTO documents (title, description, filename, filepath) VALUES (?, ?, ?, ?)";
-    const values = [title, description, file.filename, filePath];
+    const sql = `INSERT INTO documents (title, category, description, filename, filepath, uploaderName, fileSize) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    const values = [title, category, description, file.filename, filePath, uploaderName, fileSize];
 
     db.query(sql, values, (err, result) => {
         if (err) {
@@ -143,31 +144,55 @@ app.post('/increment-download', (req, res) => {
     });
 });  
 app.post('/register', async (req, res) => {
-    const { username, email, password } = req.body;
-    if (!username || !email || !password) {
-      return res.status(400).json({ message: 'All fields are required' });
-    }
-  
-    try {
+  const { username, email, password } = req.body;
+  if (!username || !email || !password) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
+
+  try {
+    // Check if email already exists (optional but recommended)
+    const checkSql = 'SELECT * FROM users WHERE email = ?';
+    db.query(checkSql, [email], async (err, results) => {
+      if (err) {
+        console.error('Error checking user:', err);
+        return res.status(500).json({ message: 'Server error' });
+      }
+
+      if (results.length > 0) {
+        return res.status(400).json({ message: 'Email already registered' });
+      }
+
       // Hash the password
       const hashedPassword = await bcrypt.hash(password, 10);
-  
+
       // Insert the new user into the database
-      const sql = 'INSERT INTO users (username, email, password) VALUES (?, ?, ?)';
+      const insertSql = 'INSERT INTO users (username, email, password) VALUES (?, ?, ?)';
       const values = [username, email, hashedPassword];
-  
-      db.query(sql, values, (err, result) => {
+
+      db.query(insertSql, values, (err, result) => {
         if (err) {
           console.error('Error registering user:', err);
           return res.status(500).json({ message: 'Server error' });
         }
         res.status(201).json({ message: 'User registered successfully' });
       });
-    } catch (error) {
-      console.error('Registration error:', error);
-      res.status(500).json({ message: 'Server error' });
+    });
+
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+app.get('/documents', (req, res) => {
+  db.query('SELECT * FROM documents ORDER BY id DESC', (err, results) => {
+    if (err) {
+      console.error('Error fetching documents:', err);
+      return res.status(500).json({ message: 'Database error' });
     }
+    res.json(results);
   });
+});
   
   // Login Route
   app.post('/login', async (req, res) => {
@@ -177,7 +202,6 @@ app.post('/register', async (req, res) => {
     }
   
     try {
-      // Find the user by email
       const sql = 'SELECT * FROM users WHERE email = ?';
       db.query(sql, [email], async (err, results) => {
         if (err) {
@@ -190,25 +214,28 @@ app.post('/register', async (req, res) => {
         }
   
         const user = results[0];
-  
-        // Compare password with the hashed password in DB
         const match = await bcrypt.compare(password, user.password);
         if (!match) {
           return res.status(401).json({ message: 'Invalid credentials' });
         }
   
-        // Generate a JWT token for the user
         const token = jwt.sign({ id: user.id, username: user.username }, 'your_jwt_secret', {
           expiresIn: '1h',
         });
-  
-        res.status(200).json({ message: 'Login successful', token });
+          res.status(200).json({ 
+          message: 'Login successful', 
+          token,
+          id: user.id,
+          username: user.username,
+          email: user.email
+          
+        });
       });
     } catch (error) {
       console.error('Login error:', error);
       res.status(500).json({ message: 'Server error' });
     }
-  });
+  });  
   
   
 
