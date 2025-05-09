@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
 const cors = require('cors');
@@ -15,10 +16,10 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // MySQL Connection
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'sys123',
-    database: 'smartnotes_db'
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME
 });
 
 db.connect((err) => {
@@ -219,7 +220,7 @@ app.get('/documents', (req, res) => {
           return res.status(401).json({ message: 'Invalid credentials' });
         }
   
-        const token = jwt.sign({ id: user.id, username: user.username }, 'your_jwt_secret', {
+        const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, {
           expiresIn: '1h',
         });
           res.status(200).json({ 
