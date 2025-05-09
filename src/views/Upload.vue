@@ -53,7 +53,6 @@
 
 <script>
 import axios from 'axios';
-import { upload } from '@vercel/blob/client';
 
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
