@@ -28,7 +28,9 @@
         <div class="row g-4">
           <div v-for="doc in documents.slice(0, 8)" :key="doc.id" class="col-md-3">
             <div class="card h-100 shadow-sm">
+            <router-link :to="`/document/${doc.id}`">
               <img :src="require('@/assets/SMBC-Bank-logos.png')" alt="Document" class="card-img-top">
+            </router-link>
               <div class="card-body">
                 <h5 class="card-title text-truncate">{{ doc.title }}</h5>
                 <p class="card-text text-muted small"><i class="fas fa-download me-1"></i>{{ doc.download_count || 0 }} downloads</p>

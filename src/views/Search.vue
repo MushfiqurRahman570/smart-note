@@ -25,13 +25,17 @@
       <div class="row">
         <div class="col-md-3 mb-4" v-for="doc in documents" :key="doc.id">
           <div class="card shadow-sm border-0 h-100 doc-card">
+          <router-link :to="`/document/${doc.id}`">
             <img
               :src="require('@/assets/SMBC-Bank-logos.png')"
               alt="Document"
               class="card-img-top"
             />
+          </router-link>
             <div class="card-body d-flex flex-column">
+            <router-link :to="`/document/${doc.id}`">
               <h5 class="card-title">{{ doc.title }}</h5>
+            </router-link>
               <small class="text-muted mb-2">
                 <i class="fas fa-download me-1"></i>{{ doc.download_count || 0 }} downloads
               </small>
