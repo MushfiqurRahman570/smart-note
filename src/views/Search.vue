@@ -40,7 +40,7 @@
                 <i class="fas fa-download me-1"></i>{{ doc.download_count || 0 }} downloads
               </small>
               <a
-                :href="`http://localhost:5000${doc.filepath}`"
+                :href="`https://smartnotes-backend-cxul.onrender.com${doc.filepath}`"
                 class="btn btn-outline-primary mt-auto"
                 target="_blank"
               >
@@ -72,7 +72,7 @@ export default {
     async fetchSearchResults() {
       if (!this.query) return;
       try {
-        const res = await axios.get('http://localhost:5000/documentsbySearch', {
+        const res = await axios.get('https://smartnotes-backend-cxul.onrender.com/documentsbySearch', {
           params: { search: this.query },
         });
         this.documents = res.data;

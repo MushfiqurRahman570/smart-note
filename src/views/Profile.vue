@@ -80,7 +80,7 @@ export default {
   methods: {
     async fetchDocuments() {
       try {
-        const response = await axios.get('http://localhost:5000/documents');
+        const response = await axios.get('https://smartnotes-backend-cxul.onrender.com/documents');
         this.allDocuments = response.data || [];
       } catch (err) {
         console.error("Error fetching documents:", err);
@@ -94,7 +94,7 @@ export default {
     },
     async downloadDocument(filePath, fileName) {
       try {
-        const response = await axios.get(`http://localhost:5000/download/${filePath}`, {
+        const response = await axios.get(`https://smartnotes-backend-cxul.onrender.com/download/${filePath}`, {
           responseType: 'blob'
         });
         const url = window.URL.createObjectURL(new Blob([response.data]));

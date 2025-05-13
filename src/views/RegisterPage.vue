@@ -44,7 +44,7 @@ export default {
   methods: {
     async registerUser() {
       try {
-        const response = await axios.post('http://localhost:5000/register', {
+        const response = await axios.post('https://smartnotes-backend-cxul.onrender.com/register', {
           username: this.username,
           email: this.email,
           password: this.password,

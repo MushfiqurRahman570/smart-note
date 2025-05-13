@@ -66,7 +66,7 @@ export default {
   methods: {
     async fetchDocuments() {
       try {
-        const response = await axios.get('http://localhost:5000/documents');
+        const response = await axios.get('https://smartnotes-backend-cxul.onrender.com/documents');
         this.documents = response.data;
       } catch (error) {
         console.error('Error fetching documents:', error);
@@ -80,7 +80,7 @@ export default {
     },
     async downloadDocument(filePath, fileName, documentId) {
       try {
-        const response = await axios.get(`http://localhost:5000${filePath}`, {
+        const response = await axios.get(`https://smartnotes-backend-cxul.onrender.com${filePath}`, {
           responseType: 'blob',
         });
         const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -91,7 +91,7 @@ export default {
         link.click();
         document.body.removeChild(link);
 
-        await axios.post('http://localhost:5000/increment-download', { id: documentId });
+        await axios.post('https://smartnotes-backend-cxul.onrender.com/increment-download', { id: documentId });
       } catch (error) {
         console.error('Download error:', error);
       }

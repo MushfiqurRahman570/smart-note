@@ -34,7 +34,7 @@ export default {
   methods: {
     async fetchDocumentById(id) {
       try {
-        const response = await axios.get(`http://localhost:5000/document/${id}`);
+        const response = await axios.get(`https://smartnotes-backend-cxul.onrender.com/document/${id}`);
         this.document = response.data;
       } catch (error) {
         console.error("Error fetching document:", error);
