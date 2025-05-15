@@ -93,7 +93,7 @@ export default {
   methods: {
     async fetchDocuments() {
       try {
-        const response = await axios.get('https://smartnotes-backend-cxul.onrender.com/documents');
+        const response = await axios.get('https://smart-note-production.up.railway.app/documents');
         this.documents = response.data;
       } catch (error) {
         console.error('Error fetching documents:', error);
@@ -115,7 +115,7 @@ export default {
       formData.append('description', this.description);
 
       try {
-        const response = await axios.post('https://smartnotes-backend-cxul.onrender.com/upload', formData, {
+        const response = await axios.post('https://smart-note-production.up.railway.app/upload', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
 
@@ -133,7 +133,7 @@ export default {
     },
     async downloadDocument(filePath, fileName, documentId) {
       try {
-        const response = await axios.get(`https://smartnotes-backend-cxul.onrender.com${filePath}`, {
+        const response = await axios.get(`https://smart-note-production.up.railway.app${filePath}`, {
           responseType: 'blob',
         });
 
@@ -145,7 +145,7 @@ export default {
         link.click();
         document.body.removeChild(link);
 
-        await axios.post('https://smartnotes-backend-cxul.onrender.com/increment-download', { id: documentId });
+        await axios.post('https://smart-note-production.up.railway.app/increment-download', { id: documentId });
       } catch (error) {
         console.error('Download error:', error);
       }

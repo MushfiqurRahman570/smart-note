@@ -7,7 +7,7 @@
     <div class="d-flex justify-content-center">
       <iframe
         v-if="document.filePath"
-        :src="`http://localhost:5000${encodeURI(document.filePath)}`"
+        :src="`https://smart-note-production.up.railway.app${encodeURI(document.filePath)}`"
         width="350px"
         height="300px"
         frameborder="0"
@@ -34,7 +34,7 @@ export default {
   methods: {
     async fetchDocumentById(id) {
       try {
-        const response = await axios.get(`https://smartnotes-backend-cxul.onrender.com/document/${id}`);
+        const response = await axios.get(`https://smart-note-production.up.railway.app/${id}`);
         this.document = response.data;
       } catch (error) {
         console.error("Error fetching document:", error);

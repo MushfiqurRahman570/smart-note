@@ -88,7 +88,7 @@ export default {
       formData.append('fileSize', this.file.size);
 
       try {
-        const response = await axios.post('https://smartnotes-backend-cxul.onrender.com/upload', formData, {
+        const response = await axios.post('hhttps://smart-note-production.up.railway.app/upload', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
 
