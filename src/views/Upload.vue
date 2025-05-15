@@ -76,8 +76,15 @@ export default {
       }
 
       const storedUser = localStorage.getItem('user');
+      const token = localStorage.getItem('token');
       const parsedUser = JSON.parse(storedUser);
       const uploaderName = parsedUser?.username || 'SmartNotes User';
+
+      if (!token || !storedUser) {
+        alert('⚠️ Please log in to upload documents.');
+        this.$router.push('/login');
+        return;
+      }
 
       const formData = new FormData();
       formData.append('file', this.file);
