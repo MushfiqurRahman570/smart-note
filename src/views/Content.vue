@@ -66,7 +66,7 @@ export default {
   methods: {
     async fetchDocuments() {
       try {
-        const response = await axios.get('https://smartnotes-backend-cxul.onrender.com/documents');
+        const response = await axios.get('https://smart-note-production.up.railway.app/documents');
         this.documents = response.data;
       } catch (error) {
         console.error('Error fetching documents:', error);
