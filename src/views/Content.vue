@@ -80,7 +80,7 @@ export default {
     },
     async downloadDocument(filePath, fileName, documentId) {
       try {
-        const response = await axios.get(`https://smart-note-production.up.railway.app${filePath}`, {
+        const response = await axios.get(`${process.env.VUE_APP_API_URL}${filePath}`, {
           responseType: 'blob',
         });
         const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -91,7 +91,7 @@ export default {
         link.click();
         document.body.removeChild(link);
 
-        await axios.post('https://smart-note-production.up.railway.app/increment-download', { id: documentId });
+        await axios.post('${process.env.VUE_APP_API_URL}/increment-download', { id: documentId });
       } catch (error) {
         console.error('Download error:', error);
       }

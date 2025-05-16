@@ -49,7 +49,7 @@ export default {
   methods: {
     async loginUser() {
       try {
-        const response = await axios.post('https://smart-note-production.up.railway.app/login', {
+        const response = await axios.post('${process.env.VUE_APP_API_URL}.app/login', {
           email: this.email,
           password: this.password,
         });

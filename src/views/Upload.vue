@@ -94,15 +94,24 @@ export default {
       formData.append('uploaderName', uploaderName);
       formData.append('fileSize', this.file.size);
 
-      try {
-        const response = await axios.post('https://smart-note-production.up.railway.app/upload', formData);
+
+        try {
+          const response = await axios.post(`https://smart-note-production.up.railway.app/upload`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          });
 
         if (response.status === 200) {
-          alert('✅ Document uploaded successfully!');
+          alert('Document uploaded successfully');
+          this.title = '';
+          this.description = '';
+          this.file = null;
           this.resetForm();
         }
       } catch (error) {
         console.error('Upload error:', error);
+        console.error('Error response:', error.response);
         alert('❌ Upload failed. Please try again.');
       }
     },

@@ -40,7 +40,7 @@
                 <i class="fas fa-download me-1"></i>{{ doc.download_count || 0 }} downloads
               </small>
               <a
-                :href="`https://smartnotes-backend-cxul.onrender.com${doc.filepath}`"
+                :href="`${process.env.VUE_APP_API_URL}${doc.filepath}`"
                 class="btn btn-outline-primary mt-auto"
                 target="_blank"
               >
@@ -72,7 +72,7 @@ export default {
     async fetchSearchResults() {
       if (!this.query) return;
       try {
-        const res = await axios.get('https://smart-note-production.up.railway.app/documentsbySearch', {
+        const res = await axios.get('${process.env.VUE_APP_API_URL}/documentsbySearch', {
           params: { search: this.query },
         });
         this.documents = res.data;

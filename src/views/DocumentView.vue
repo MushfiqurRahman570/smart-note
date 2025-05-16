@@ -7,7 +7,7 @@
     <div class="d-flex justify-content-center">
       <iframe
         v-if="document.filePath"
-        :src="`https://smart-note-production.up.railway.app${encodeURI(document.filePath)}`"
+        :src="`${process.env.VUE_APP_API_URL}${encodeURI(document.filePath)}`"
         width="350px"
         height="300px"
         frameborder="0"
@@ -34,7 +34,7 @@ export default {
   methods: {
     async fetchDocumentById(id) {
       try {
-        const response = await axios.get(`https://smart-note-production.up.railway.app/document/${id}`);
+        const response = await axios.get(`${process.env.VUE_APP_API_URL}/document/${id}`);
         this.document = response.data;
       } catch (error) {
         console.error("Error fetching document:", error);

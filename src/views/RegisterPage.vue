@@ -44,7 +44,7 @@ export default {
   methods: {
     async registerUser() {
       try {
-        const response = await axios.post('https://smart-note-production.up.railway.app/register', {
+        const response = await axios.post('${process.env.VUE_APP_API_URL}/register', {
           username: this.username,
           email: this.email,
           password: this.password,

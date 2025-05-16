@@ -80,7 +80,7 @@ export default {
   methods: {
     async fetchDocuments() {
       try {
-        const response = await axios.get('https://smart-note-production.up.railway.app/documents');
+        const response = await axios.get('${process.env.VUE_APP_API_URL}/documents');
         this.allDocuments = response.data || [];
       } catch (err) {
         console.error("Error fetching documents:", err);
@@ -94,7 +94,7 @@ export default {
     },
     async downloadDocument(filePath, fileName) {
       try {
-        const response = await axios.get(`https://smart-note-production.up.railway.app/download/${filePath}`, {
+        const response = await axios.get(`${process.env.VUE_APP_API_URL}/download/${filePath}`, {
           responseType: 'blob'
         });
         const url = window.URL.createObjectURL(new Blob([response.data]));
