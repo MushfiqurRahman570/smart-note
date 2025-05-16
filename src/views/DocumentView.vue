@@ -34,7 +34,7 @@ export default {
   methods: {
     async fetchDocumentById(id) {
       try {
-        const response = await axios.get(`https://smart-note-production.up.railway.app/${id}`);
+        const response = await axios.get(`https://smart-note-production.up.railway.app/document/${id}`);
         this.document = response.data;
       } catch (error) {
         console.error("Error fetching document:", error);
