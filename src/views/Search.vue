@@ -72,7 +72,7 @@ export default {
     async fetchSearchResults() {
       if (!this.query) return;
       try {
-        const res = await axios.get('http://localhost:5000/documentsbySearch', {
+        const res = await axios.get('https://smart-note-production.up.railway.app/documentsbySearch', {
           params: { search: this.query },
         });
         this.documents = res.data;
