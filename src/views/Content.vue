@@ -31,12 +31,14 @@
               />
             </router-link>
               <div class="card-body d-flex flex-column">
-              <router-link :to="`/document/${document.id}`">
-                <h5 class="card-title mb-2">{{ document.title }}</h5>
-              </router-link>
-                <small class="text-muted mb-3">
-                  <i class="fas fa-download me-1"></i>{{ document.download_count || 0 }} downloads
-                </small>
+              <h5 class="fw-bold text-truncate mb-1">{{ document.title }}</h5>
+                <p class="text-muted small mb-0">
+                  <i class="fas fa-user me-2"></i> {{ document.uploaderName || 'Unknown Author' }}
+                </p>
+                <p class="card-text text-muted small">
+                  <i class="fas fa-eye me-2"></i>{{ document.view_count || 0 }} views &nbsp;&nbsp;
+                  <i class="fas fa-download me-2"></i>{{ document.download_count || 0 }} downloads
+                </p>
                 <a class="btn btn-outline-primary mt-auto"
                   @click="downloadDocument(document.filepath, document.title + '.pdf', document.id)"> Download </a>
               </div>

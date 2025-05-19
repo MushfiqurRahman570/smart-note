@@ -53,7 +53,6 @@
                   <i class="fas fa-eye me-2"></i>{{ doc.view_count || 0 }} views &nbsp;&nbsp;
                   <i class="fas fa-download me-2"></i>{{ doc.download_count || 0 }} downloads
                 </p>
-                <!-- <button class="btn btn-primary w-100" @click="downloadDocument(doc.filePath, doc.fileName, doc.id)">Download</button> -->
               </div>
             </div>
           </div>
