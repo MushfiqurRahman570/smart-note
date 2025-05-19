@@ -1,7 +1,7 @@
 <template>
   <div class="container py-5 content-padding">
     <!-- Document Title and Description -->
-    <h2 class="text-center mb-3 fw-bold">{{ document.title }}</h2>
+    <h2 class="text-center mb-3 fw-bold titleTxt">{{ document.title }}</h2>
     <p class="text-center text-muted fs-5">{{ document.description }}</p>
 
     <!-- PDF Viewer -->
@@ -16,6 +16,8 @@
       ></iframe>
       <div v-else class="alert alert-warning">Loading document...</div>
     </div>
+
+        <button class="btn btn-primary w-50 downloadBtn" @click="downloadDocument(document.filePath, document.fileName, document.id)">Download</button>
 
     <!-- Related Documents Section -->
     <div v-if="relatedDocuments.length" class="mt-5">
@@ -66,6 +68,32 @@ export default {
         alert("Failed to load document.");
       }
     },
+    async downloadDocument(filePath, fileName, documentId) {
+      try {
+        const response = await axios.get(`https://smart-note-production.up.railway.app${filePath}`, {
+          responseType: 'blob',
+        });
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        await axios.post('https://smart-note-production.up.railway.app/increment-download', { id: documentId });
+      } catch (error) {
+        console.error('Download error:', error);
+      }
+    },
+    async incrementViewCount(documentId) {
+    try {
+      await axios.post('https://smart-note-production.up.railway.app/increment-view', { id: documentId });
+        } catch (error) {
+      console.error('View increment error:', error);
+      }
+     },
     async fetchRelatedDocuments(category, currentId) {
       try {
         const response = await axios.get(`https://smart-note-production.up.railway.app/documents`);
@@ -105,5 +133,12 @@ iframe {
 }
 .card-title {
   font-size: 1rem;
+}
+.downloadBtn {
+  right: 50px;
+}
+.titleTxt {
+    padding-top: 30px;
+    font-size: 2rem;
 }
 </style>

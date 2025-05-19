@@ -28,18 +28,32 @@
         <div class="row g-4">
           <div v-for="doc in documents.slice(0, 8)" :key="doc.id" class="col-md-3">
             <div class="card h-100 shadow-sm">
-            <div @click="incrementViewCount(doc.id)">
-              <router-link :to="`/document/${doc.id}`">
-              <img :src="require('@/assets/SMBC-Bank-logos.png')" alt="Document" class="card-img-top" />
-              </router-link>
-            </div>
+            
               <div class="card-body">
-                <h5 class="card-title text-truncate">{{ doc.title }}</h5>
+                <div class="position-relative">
+                  <div @click="incrementViewCount(doc.id)">
+              <router-link :to="`/document/${doc.id}`">
+                <img :src="require('@/assets/SMBC-Bank-logos.png')" alt="Document" class="card-img-top" />
+              </router-link>
+              </div>  
+              <div class="overlay-info d-flex justify-content-between px-2 py-1">
+                <small class="text-white">
+                  <i class="fas fa-file-alt me-1"></i> {{ formatFileSize(doc.fileSize || doc.file_size) }}
+                </small>
+              <small class="text-white">
+                <i class="fas fa-calendar-alt me-1"></i> {{ formatDate(doc.upload_date) }}
+              </small>
+            </div>
+          </div>
+                <h5 class="fw-bold text-truncate mb-1">{{ doc.title }}</h5>
+                <p class="text-muted small mb-0">
+                  <i class="fas fa-user me-2"></i> {{ doc.uploaderName || 'Unknown Author' }}
+                </p>
                 <p class="card-text text-muted small">
                   <i class="fas fa-eye me-2"></i>{{ doc.view_count || 0 }} views &nbsp;&nbsp;
                   <i class="fas fa-download me-2"></i>{{ doc.download_count || 0 }} downloads
                 </p>
-                <button class="btn btn-primary w-100" @click="downloadDocument(doc.filePath, doc.fileName, doc.id)">Download</button>
+                <!-- <button class="btn btn-primary w-100" @click="downloadDocument(doc.filePath, doc.fileName, doc.id)">Download</button> -->
               </div>
             </div>
           </div>
@@ -166,6 +180,21 @@ export default {
       if (this.searchQuery.trim()) {
         this.$router.push({ path: '/search', query: { q: this.searchQuery.trim() } });
       }
+    },
+     formatFileSize(bytes) {
+      if (!bytes && bytes !== 0) return 'N/A';
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    },
+
+    // Utility method to format upload date (YYYY-MM-DD or ISO string)
+    formatDate(dateString) {
+      if (!dateString) return 'N/A';
+      const options = { year: 'numeric', month: 'short', day: 'numeric' };
+      return new Date(dateString).toLocaleDateString(undefined, options);
     }
   }
 };
@@ -178,5 +207,12 @@ export default {
 .card-title {
   font-size: 1.1rem;
   font-weight: 600;
+}
+.overlay-info {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: rgba(83, 81, 81, 0.6); /* semi-transparent dark background */
+  font-size: 0.75rem;
 }
 </style>
