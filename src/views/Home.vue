@@ -28,12 +28,17 @@
         <div class="row g-4">
           <div v-for="doc in documents.slice(0, 8)" :key="doc.id" class="col-md-3">
             <div class="card h-100 shadow-sm">
-            <router-link :to="`/document/${doc.id}`">
-              <img :src="require('@/assets/SMBC-Bank-logos.png')" alt="Document" class="card-img-top">
-            </router-link>
+            <div @click="incrementViewCount(doc.id)">
+              <router-link :to="`/document/${doc.id}`">
+              <img :src="require('@/assets/SMBC-Bank-logos.png')" alt="Document" class="card-img-top" />
+              </router-link>
+            </div>
               <div class="card-body">
                 <h5 class="card-title text-truncate">{{ doc.title }}</h5>
-                <p class="card-text text-muted small"><i class="fas fa-download me-1"></i>{{ doc.download_count || 0 }} downloads</p>
+                <p class="card-text text-muted small">
+                  <i class="fas fa-eye me-2"></i>{{ doc.view_count || 0 }} views &nbsp;&nbsp;
+                  <i class="fas fa-download me-2"></i>{{ doc.download_count || 0 }} downloads
+                </p>
                 <button class="btn btn-primary w-100" @click="downloadDocument(doc.filePath, doc.fileName, doc.id)">Download</button>
               </div>
             </div>
@@ -115,7 +120,7 @@ export default {
       formData.append('description', this.description);
 
       try {
-        const response = await axios.post('${process.env.VUE_APP_API_URL}/upload', formData, {
+        const response = await axios.post(`${process.env.VUE_APP_API_URL}/upload`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
 
@@ -133,7 +138,7 @@ export default {
     },
     async downloadDocument(filePath, fileName, documentId) {
       try {
-        const response = await axios.get(`${process.env.VUE_APP_API_URL}${filePath}`, {
+        const response = await axios.get(`https://smart-note-production.up.railway.app${filePath}`, {
           responseType: 'blob',
         });
 
@@ -150,6 +155,13 @@ export default {
         console.error('Download error:', error);
       }
     },
+    async incrementViewCount(documentId) {
+    try {
+      await axios.post('https://smart-note-production.up.railway.app/increment-view', { id: documentId });
+        } catch (error) {
+      console.error('View increment error:', error);
+      }
+     },
     goToSearchPage() {
       if (this.searchQuery.trim()) {
         this.$router.push({ path: '/search', query: { q: this.searchQuery.trim() } });
