@@ -30,19 +30,13 @@
       </div>
 
       <div class="mb-3">
-        <label for="priceInput" class="form-label">Price (USD)</label>
-        <input
-          v-model="priceInput"
-          @input="formatPrice"
-          type="number"
-          min="0"
-          step="0.01"
-          id="priceInput"
-          class="form-control"
-          required
-        />
-        <small v-if="priceDisplay" class="text-muted">Price: {{ priceDisplay }}</small>
+<div class="mb-3">
+  <label for="priceInput" class="form-label">Price (USD)</label>
+  <input v-model="priceInput" type="number" min="0" step="0.01" id="priceInput" class="form-control" required />
+</div>
+    <small v-if="priceDisplay" class="text-muted">Price: {{ priceDisplay }}</small>
       </div>
+
 
       <div class="mb-3">
         <label for="documentDescription" class="form-label">Document Description</label>
@@ -70,9 +64,9 @@
 import axios from 'axios';
 
 export default {
-// eslint-disable-next-line vue/multi-word-component-names
+  // eslint-disable-next-line vue/multi-word-component-names
   name: "upload",
-    data() {
+  data() {
     return {
       title: '',
       description: '',
@@ -86,20 +80,21 @@ export default {
     onFileChange(event) {
       this.file = event.target.files[0];
     },
-    formatPrice() {
-      // Remove invalid characters
-      let val = this.priceInput.toString().replace(/[^0-9.]/g, '');
-      this.priceInput = val;
+     formatPrice() {
+    // Remove any characters except digits and dot
+    let val = this.priceInput.replace(/[^0-9.]/g, '');
 
-      // Format price display
-      if (!val || parseFloat(val) === 0) {
-        this.priceDisplay = 'Free';
-      } else {
-        this.priceDisplay = `৳${parseFloat(val).toFixed(2)}`;
-      }
-    },
+    this.priceInput = val;
+
+    // Check if value is 0 or 00.00 or empty -> display "Free"
+    if (val === '' || parseFloat(val) === 0) {
+      this.priceDisplay = 'Free';
+    } else {
+      this.priceDisplay = `৳${val}`;
+    }
+  },
     async uploadDocument() {
-      if (!this.file || !this.title || !this.description || !this.category || !this.priceInput) {
+      if (!this.file || !this.title || !this.description || !this.category|| !this.priceInput) {
         alert('Please fill in all fields and choose a file.');
         return;
       }
@@ -123,19 +118,25 @@ export default {
       formData.append('category', this.category);
       formData.append('uploaderName', uploaderName);
       formData.append('fileSize', this.file.size);
-      formData.append('price', price); // corrected key
+      formData.append('priceInput', price);
 
-      try {
-        const response = await axios.post(`https://smart-note-production.up.railway.app/upload`, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
+        try {
+          const response = await axios.post(`https://smart-note-production.up.railway.app/upload`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          });
 
         if (response.status === 200) {
-          alert('✅ Document uploaded successfully');
+          alert('Document uploaded successfully');
+          this.title = '';
+          this.description = '';
+          this.file = null;
           this.resetForm();
         }
       } catch (error) {
         console.error('Upload error:', error);
+        console.error('Error response:', error.response);
         alert('❌ Upload failed. Please try again.');
       }
     },

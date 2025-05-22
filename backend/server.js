@@ -96,51 +96,27 @@ app.get('/document/:id', (req, res) => {
 
 // Upload Route
 app.post('/upload', upload.single('file'), (req, res) => {
-  const { title, category, description, uploaderName, priceInput, fileSize } = req.body;
+  const { title, category, description, uploaderName, price} = req.body;
+  const fileSize = parseInt(req.body.fileSize, 10);
   const file = req.file;
 
-  // Validate required fields
-  if (!file || !title || !description || !uploaderName || !category || !priceInput || !fileSize) {
-    return res.status(400).json({ message: '⚠️ All fields including uploader name are required' });
+  if (!file || !title || !description || !uploaderName || !category ) {
+      return res.status(400).json({ message: 'All fields including uploader name are required' });
   }
 
-  const price = parseFloat(priceInput);
-  const fileSizeParsed = parseInt(fileSize, 10);
+    // Construct the file path for the database
+    const filePath = `/uploads/${file.filename}`; // The file path accessible through the server
 
-  if (isNaN(price)) {
-    return res.status(400).json({ message: '⚠️ Invalid price value' });
-  }
+    // Insert the document into the database
+    const sql = `INSERT INTO documents (title, category, description, filename, filepath, uploaderName, fileSize, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+    const values = [title, category, description, file.filename, filePath, uploaderName, fileSize, price];
 
-  if (isNaN(fileSizeParsed)) {
-    return res.status(400).json({ message: '⚠️ Invalid file size value' });
-  }
-
-  const filePath = `/uploads/${file.filename}`; // Accessible path
-
-  const sql = `
-    INSERT INTO documents 
-    (title, category, description, filename, filepath, uploaderName, fileSize, price) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-
-  const values = [
-    title,
-    category,
-    description,
-    file.filename,
-    filePath,
-    uploaderName,
-    fileSizeParsed,
-    price
-  ];
-
-  console.log('Insert values:', values); // Debug log
-
-  db.query(sql, values, (err, result) => {
-    if (err) {
-      console.error('❌ DB Insert Error:', err);
-      return res.status(500).json({ message: '❌ Database error' });
+    db.query(sql, values, (err, result) => {
+        if (err) {
+      console.error('DB Insert Error:', err);
+      return res.status(500).json({ message: 'Database error' });
     }
-    return res.status(200).json({ message: '✅ Document uploaded successfully', documentId: result.insertId });
+    return res.status(200).json({ message: 'Document uploaded', documentId: result.insertId });
   });
 });
 
