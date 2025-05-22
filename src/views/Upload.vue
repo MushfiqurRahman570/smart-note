@@ -30,16 +30,10 @@
       </div>
 
       <div class="mb-3">
-  <label for="documentPrice" class="form-label">Price (e.g. 10.00)</label>
-    <input
-      v-model="priceInput"
-      type="text"
-      id="documentPrice"
-      class="form-control"
-      placeholder="Enter price or 00.00 for free"
-      @input="formatPrice"
-      required
-    />
+<div class="mb-3">
+  <label for="priceInput" class="form-label">Price (USD)</label>
+  <input v-model="priceInput" type="number" min="0" step="0.01" id="priceInput" class="form-control" required />
+</div>
     <small v-if="priceDisplay" class="text-muted">Price: {{ priceDisplay }}</small>
       </div>
 
@@ -78,7 +72,7 @@ export default {
       description: '',
       category: '',
       file: null,
-      priceInput: '',
+      price: '',
       priceDisplay: '',
     };
   },
@@ -124,7 +118,7 @@ export default {
       formData.append('category', this.category);
       formData.append('uploaderName', uploaderName);
       formData.append('fileSize', this.file.size);
-      formData.append('priceInput', this.priceInput);
+      formData.append('priceInput', this.price);
 
         try {
           const response = await axios.post(`https://smart-note-production.up.railway.app/upload`, formData, {
