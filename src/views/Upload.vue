@@ -118,7 +118,7 @@ export default {
       formData.append('category', this.category);
       formData.append('uploaderName', uploaderName);
       formData.append('fileSize', this.file.size);
-      formData.append('priceInput', this.price);
+      formData.append('priceInput', price);
 
         try {
           const response = await axios.post(`https://smart-note-production.up.railway.app/upload`, formData, {
