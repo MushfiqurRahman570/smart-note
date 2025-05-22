@@ -28,12 +28,17 @@
           <option>Entertainment</option>
         </select>
       </div>
-
       <div class="mb-3">
-<div class="mb-3">
-  <label for="priceInput" class="form-label">Price (USD)</label>
-  <input v-model="priceInput" type="number" min="0" step="0.01" id="priceInput" class="form-control" required />
-</div>
+        <label for="priceInput" class="form-label">Price (USD)</label>
+        <input
+          v-model="priceInput"
+          type="text"
+          id="priceInput"
+          class="form-control"
+          placeholder="Enter Price (e.g., 10.00)"
+          @input="formatPrice"
+          required
+        />
     <small v-if="priceDisplay" class="text-muted">Price: {{ priceDisplay }}</small>
       </div>
 
@@ -118,7 +123,7 @@ export default {
       formData.append('category', this.category);
       formData.append('uploaderName', uploaderName);
       formData.append('fileSize', this.file.size);
-      formData.append('priceInput', price);
+      formData.append('price', price);
 
         try {
           const response = await axios.post(`https://smart-note-production.up.railway.app/upload`, formData, {

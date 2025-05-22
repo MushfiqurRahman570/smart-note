@@ -100,7 +100,7 @@ app.post('/upload', upload.single('file'), (req, res) => {
   const fileSize = parseInt(req.body.fileSize, 10);
   const file = req.file;
 
-  if (!file || !title || !description || !uploaderName || !category ) {
+  if (!file || !title || !description || !uploaderName || !category || !fileSize || !price) {
       return res.status(400).json({ message: 'All fields including uploader name are required' });
   }
 
