@@ -72,7 +72,7 @@ export default {
       description: '',
       category: '',
       file: null,
-      price: '',
+      priceInput: '',
       priceDisplay: '',
     };
   },
@@ -103,7 +103,7 @@ export default {
       const token = localStorage.getItem('token');
       const parsedUser = JSON.parse(storedUser);
       const uploaderName = parsedUser?.username || 'SmartNotes User';
-      // const price = parseFloat(this.priceInput);
+      const price = parseFloat(this.priceInput);
 
       if (!token || !storedUser) {
         alert('⚠️ Please log in to upload documents.');
