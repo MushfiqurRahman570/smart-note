@@ -44,7 +44,7 @@ const upload = multer({ storage });
 
 // Fetch all documents from the database
 app.get('/documents', (req, res) => {
-    const sql = 'SELECT * FROM documents';
+    const sql = 'SELECT * FROM documents ORDER BY id DESC';
     db.query(sql, (err, results) => {
         if (err) {
             console.error('Fetch error:', err);
@@ -96,29 +96,35 @@ app.get('/document/:id', (req, res) => {
 
 // Upload Route
 app.post('/upload', upload.single('file'), (req, res) => {
-  const { title, category, description, uploaderName} = req.body;
+  const { title, category, description, uploaderName } = req.body;
+  const price = parseFloat(req.body.priceInput);
   const fileSize = parseInt(req.body.fileSize, 10);
   const file = req.file;
 
-  if (!file || !title || !description || !uploaderName || !category ) {
-      return res.status(400).json({ message: 'All fields including uploader name are required' });
+  if (!file || !title || !description || !uploaderName || !category) {
+    return res.status(400).json({ message: 'All fields including uploader name are required' });
   }
 
-    // Construct the file path for the database
-    const filePath = `/uploads/${file.filename}`; // The file path accessible through the server
+  const filePath = `/uploads/${file.filename}`;
 
-    // Insert the document into the database
-    const sql = `INSERT INTO documents (title, category, description, filename, filepath, uploaderName, fileSize) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-    const values = [title, category, description, file.filename, filePath, uploaderName, fileSize];
+  const sql = `
+    INSERT INTO documents 
+    (title, category, description, filename, filepath, uploaderName, fileSize, price) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
 
-    db.query(sql, values, (err, result) => {
-        if (err) {
+  const values = [title, category, description, file.filename, filePath, uploaderName, fileSize, price];
+
+  console.log('Insert values:', values); // Debug log
+
+  db.query(sql, values, (err, result) => {
+    if (err) {
       console.error('DB Insert Error:', err);
       return res.status(500).json({ message: 'Database error' });
     }
     return res.status(200).json({ message: 'Document uploaded', documentId: result.insertId });
   });
 });
+
 
 app.post('/increment-download', (req, res) => {
     const { id } = req.body;

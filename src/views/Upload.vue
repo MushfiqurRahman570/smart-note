@@ -30,6 +30,21 @@
       </div>
 
       <div class="mb-3">
+  <label for="documentPrice" class="form-label">Price (e.g. 10.00)</label>
+    <input
+      v-model="priceInput"
+      type="text"
+      id="documentPrice"
+      class="form-control"
+      placeholder="Enter price or 00.00 for free"
+      @input="formatPrice"
+      required
+    />
+    <small v-if="priceDisplay" class="text-muted">Price: {{ priceDisplay }}</small>
+      </div>
+
+
+      <div class="mb-3">
         <label for="documentDescription" class="form-label">Document Description</label>
         <textarea
           v-model="description"
@@ -63,14 +78,29 @@ export default {
       description: '',
       category: '',
       file: null,
+      priceInput: '',
+      priceDisplay: '',
     };
   },
   methods: {
     onFileChange(event) {
       this.file = event.target.files[0];
     },
+     formatPrice() {
+    // Remove any characters except digits and dot
+    let val = this.priceInput.replace(/[^0-9.]/g, '');
+
+    this.priceInput = val;
+
+    // Check if value is 0 or 00.00 or empty -> display "Free"
+    if (val === '' || parseFloat(val) === 0) {
+      this.priceDisplay = 'Free';
+    } else {
+      this.priceDisplay = `৳${val}`;
+    }
+  },
     async uploadDocument() {
-      if (!this.file || !this.title || !this.description || !this.category) {
+      if (!this.file || !this.title || !this.description || !this.category|| !this.priceInput) {
         alert('Please fill in all fields and choose a file.');
         return;
       }
@@ -79,6 +109,7 @@ export default {
       const token = localStorage.getItem('token');
       const parsedUser = JSON.parse(storedUser);
       const uploaderName = parsedUser?.username || 'SmartNotes User';
+      // const price = parseFloat(this.priceInput);
 
       if (!token || !storedUser) {
         alert('⚠️ Please log in to upload documents.');
@@ -93,7 +124,7 @@ export default {
       formData.append('category', this.category);
       formData.append('uploaderName', uploaderName);
       formData.append('fileSize', this.file.size);
-
+      formData.append('priceInput', this.priceInput);
 
         try {
           const response = await axios.post(`https://smart-note-production.up.railway.app/upload`, formData, {
@@ -120,6 +151,8 @@ export default {
       this.description = '';
       this.category = '';
       this.file = null;
+      this.priceInput = '';
+      this.priceDisplay = '';
       document.getElementById('documentFile').value = null;
     },
   },
