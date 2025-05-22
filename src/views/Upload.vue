@@ -28,17 +28,18 @@
           <option>Entertainment</option>
         </select>
       </div>
+
       <div class="mb-3">
-        <label for="priceInput" class="form-label">Price (USD)</label>
-        <input
-          v-model="priceInput"
-          type="text"
-          id="priceInput"
-          class="form-control"
-          placeholder="Enter Price (e.g., 10.00)"
-          @input="formatPrice"
-          required
-        />
+  <label for="documentPrice" class="form-label">Price (e.g. 10.00)</label>
+    <input
+      v-model="priceInput"
+      type="text"
+      id="documentPrice"
+      class="form-control"
+      placeholder="Enter price or 00.00 for free"
+      @input="formatPrice"
+      required
+    />
     <small v-if="priceDisplay" class="text-muted">Price: {{ priceDisplay }}</small>
       </div>
 
@@ -98,8 +99,8 @@ export default {
       this.priceDisplay = `৳${val}`;
     }
   },
-    async uploadDocument() {
-      if (!this.file || !this.title || !this.description || !this.category|| !this.priceInput) {
+     async uploadDocument() {
+      if (!this.file || !this.title || !this.description || !this.category || !this.priceInput) {
         alert('Please fill in all fields and choose a file.');
         return;
       }
@@ -124,6 +125,7 @@ export default {
       formData.append('uploaderName', uploaderName);
       formData.append('fileSize', this.file.size);
       formData.append('price', price);
+
 
         try {
           const response = await axios.post(`https://smart-note-production.up.railway.app/upload`, formData, {
@@ -150,8 +152,6 @@ export default {
       this.description = '';
       this.category = '';
       this.file = null;
-      this.priceInput = '';
-      this.priceDisplay = '';
       document.getElementById('documentFile').value = null;
     },
   },

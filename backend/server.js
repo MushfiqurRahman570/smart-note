@@ -96,19 +96,23 @@ app.get('/document/:id', (req, res) => {
 
 // Upload Route
 app.post('/upload', upload.single('file'), (req, res) => {
-  const { title, category, description, uploaderName, price} = req.body;
+  const { title, category, description, uploaderName} = req.body;
   const fileSize = parseInt(req.body.fileSize, 10);
+  const price = parseFloat(req.body.price);
   const file = req.file;
 
-  if (!file || !title || !description || !uploaderName || !category || !fileSize || !price) {
-      return res.status(400).json({ message: 'All fields including uploader name are required' });
-  }
+  console.log('Parsed prices:', price);
+
+
+  if (!file || !title || !description || !uploaderName || !category || fileSize === undefined || price === undefined || price === null) {
+  return res.status(400).json({ message: 'All fields including uploader name are required' });
+}
 
     // Construct the file path for the database
     const filePath = `/uploads/${file.filename}`; // The file path accessible through the server
 
     // Insert the document into the database
-    const sql = `INSERT INTO documents (title, category, description, filename, filepath, uploaderName, fileSize, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO documents (title, category, description, filename, filepath, uploaderName, fileSize, price ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
     const values = [title, category, description, file.filename, filePath, uploaderName, fileSize, price];
 
     db.query(sql, values, (err, result) => {
@@ -119,6 +123,7 @@ app.post('/upload', upload.single('file'), (req, res) => {
     return res.status(200).json({ message: 'Document uploaded', documentId: result.insertId });
   });
 });
+
 
 
 app.post('/increment-download', (req, res) => {
